@@ -5,27 +5,23 @@ const fs = require("fs");
 const multer = require("multer");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static("public")); // for serving index.html
-app.use('/uploads', express.static('uploads'));
+app.use(express.static("public")); // Serve index.html
+app.use('/uploads', express.static('uploads')); // Serve uploaded images
 
-
-// Multer setup (file upload)
+// Multer setup
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/"); // Folder to save uploaded pics
+    cb(null, "uploads/");
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname); // Unique file name
+    cb(null, Date.now() + "-" + file.originalname);
   },
 });
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "indexx.html"));
-  });
-  
+
 const upload = multer({
   storage: storage,
   limits: { fileSize: 1 * 1024 * 1024 }, // 1 MB limit
@@ -35,6 +31,11 @@ const upload = multer({
 if (!fs.existsSync("uploads")) {
   fs.mkdirSync("uploads");
 }
+
+// Serve form HTML
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "indexx.html"));
+});
 
 // Handle form submission
 app.post("/submit", upload.single("profilePic"), (req, res) => {
@@ -52,10 +53,15 @@ app.post("/submit", upload.single("profilePic"), (req, res) => {
     if (err) {
       return res.send("❌ Error saving data.");
     }
-    res.send("✅ Thank you! Your response has been recorded.");
+    res.send(`
+      <h2>✅ Uploaded Successfully</h2>
+      <p>Name: ${name}</p>
+      <p>DOB: ${dob}</p>
+      <p>Phone: ${phone}</p>
+      <img src="/uploads/${file.filename}" width="200" />
+    `);
   });
 });
-//app.use('/uploads', express.static('uploads'));
 
 // Start server
 app.listen(PORT, () => {
