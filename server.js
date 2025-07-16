@@ -10,6 +10,8 @@ const PORT = 3000;
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public")); // for serving index.html
+app.use('/uploads', express.static('uploads'));
+
 
 // Multer setup (file upload)
 const storage = multer.diskStorage({
@@ -53,6 +55,7 @@ app.post("/submit", upload.single("profilePic"), (req, res) => {
     res.send("✅ Thank you! Your response has been recorded.");
   });
 });
+//app.use('/uploads', express.static('uploads'));
 
 // Start server
 app.listen(PORT, () => {
