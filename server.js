@@ -44,6 +44,7 @@ app.post("/submit", upload.single("profilePic"), (req, res) => {
   }
 
   const data = `Name: ${name}, DOB: ${dob}, Phone: ${phone}, File: ${file.filename}\n`;
+  console.log("Form Submission =>", data);
 
   fs.appendFile("submissions.txt", data, (err) => {
     if (err) {
